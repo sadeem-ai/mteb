@@ -4,16 +4,10 @@ import logging
 from datetime import date
 from typing import List, Mapping, Union
 
-from pydantic import (
-    AnyUrl,
-    BaseModel,
-    BeforeValidator,
-    TypeAdapter,
-    field_validator,
-)
+from pydantic import AnyUrl, BaseModel, BeforeValidator, TypeAdapter, field_validator
 from typing_extensions import Annotated, Literal
 
-from .languages import (
+from ..languages import (
     ISO_TO_LANGUAGE,
     ISO_TO_SCRIPT,
     path_to_lang_codes,
@@ -22,6 +16,7 @@ from .languages import (
 
 TASK_SUBTYPE = Literal[
     "Article retrieval",
+    "Conversational retrieval",
     "Dialect pairing",
     "Dialog Systems",
     "Discourse coherence",
@@ -37,6 +32,8 @@ TASK_SUBTYPE = Literal[
     "Code retrieval",
     "False Friends",
     "Cross-Lingual Semantic Discrimination",
+    "Textual Entailment",
+    "Counterfactual Detection",
 ]
 
 TASK_DOMAIN = Literal[
@@ -65,6 +62,7 @@ TEXT_CREATION_METHOD = Literal[
     "created",
     "machine-translated",
     "human-translated and localized",
+    "human-translated",
     "machine-translated and verified",
     "machine-translated and localized",
     "LM-generated and verified",
@@ -80,6 +78,7 @@ SOCIOECONOMIC_STATUS = Literal[
 TASK_TYPE = Literal[
     "BitextMining",
     "Classification",
+    "MultilabelClassification",
     "Clustering",
     "PairClassification",
     "Reranking",
@@ -108,9 +107,13 @@ STR_DATE = Annotated[
 ]  # Allows the type to be a string, but ensures that the string is a valid date
 
 SPLIT_NAME = str
-# a 3-letter ISO 639-3 language code followed by a 4-letter ISO 15924 script code (e.g. "eng-Latn")
-ISO_LANGUAGE_SCRIPT = str
-LANGUAGES = Union[List[ISO_LANGUAGE_SCRIPT], Mapping[str, List[ISO_LANGUAGE_SCRIPT]]]
+ISO_LANGUAGE_SCRIPT = str  # a 3-letter ISO 639-3 language code followed by a 4-letter ISO 15924 script code (e.g. "eng-Latn")
+ISO_LANGUAGE = str  # a 3-letter ISO 639-3 language code
+ISO_SCRIPT = str  # a 4-letter ISO 15924 script code
+HFSubset = str
+LANGUAGES = Union[
+    List[ISO_LANGUAGE_SCRIPT], Mapping[HFSubset, List[ISO_LANGUAGE_SCRIPT]]
+]
 
 PROGRAMMING_LANGS = [
     "python",
@@ -285,3 +288,10 @@ class TaskMetadata(BaseModel):
         return all(
             getattr(self, field_name) is not None for field_name in self.model_fields
         )
+
+    @property
+    def hf_subsets_to_langscripts(self) -> dict[HFSubset, list[ISO_LANGUAGE_SCRIPT]]:
+        """Return a dictionary mapping huggingface subsets to languages."""
+        if isinstance(self.eval_langs, dict):
+            return self.eval_langs
+        return {"default": self.eval_langs}  # type: ignore

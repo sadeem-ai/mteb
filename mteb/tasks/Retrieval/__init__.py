@@ -53,6 +53,7 @@ from .eng.NQRetrieval import *
 from .eng.QuoraRetrieval import *
 from .eng.SCIDOCSRetrieval import *
 from .eng.SciFactRetrieval import *
+from .eng.TopiOCQARetrieval import *
 from .eng.Touche2020Retrieval import *
 from .eng.TRECCOVIDRetrieval import *
 from .est.estqa import *
@@ -66,6 +67,8 @@ from .kat.GeorgianFAQRetrieval import *
 from .kor.KoMiracl import *
 from .kor.KoStrategyQA import *
 from .multilingual.BelebeleRetrieval import *
+from .multilingual.CrossLingualSemanticDiscriminationWMT19 import *
+from .multilingual.CrossLingualSemanticDiscriminationWMT21 import *
 from .multilingual.IndicQARetrieval import *
 from .multilingual.MintakaRetrieval import *
 from .multilingual.MIRACLRetrieval import *
